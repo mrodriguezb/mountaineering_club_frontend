@@ -1,26 +1,57 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Navbar from './components/navbar.js'
+import Dashboard from './components/dashboard.js';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch
+} from "react-router-dom";
+import Members from './components/members.js';
+import Excursions from './components/excursions.js';
+import EditMember from './components/editMember';
+import {ContextProvider} from './context/ContextProvider.js';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+
+
+
+class App extends React.Component {
+
+constructor(props) {
+  super(props);
+
 }
 
+  render() {
+
+    return (
+      <div>
+        <ContextProvider>
+          <Router>
+            <Switch>
+              <Route path="/" exact component = {Dashboard}/>
+              <Route path="/members" exact component = {Members}/>
+              <Route path="/excursions" exact component = {Excursions}/>
+              <Route path= "/editmember" component={EditMember} />
+            </Switch>
+          </Router>
+          </ContextProvider>
+      
+      </div>
+    );
+  }
+}
+
+
 export default App;
+/*
+<div className="App">
+        <Navbar {...this.props}/>
+        <header className="App-header">
+          <Dashboard/>
+          <br/>
+       
+        </header>
+      </div>*/
