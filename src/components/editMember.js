@@ -2,6 +2,9 @@ import React from "react";
 import { AppContext } from "./../context/ContextProvider";
 import Navbar from "./navbar";
 
+
+
+
 class EditMember extends React.Component {
 
     static contextType = AppContext;
@@ -24,14 +27,16 @@ class EditMember extends React.Component {
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleSurnameChange = this.handleSurnameChange.bind(this);
         this.editMember = this.editMember.bind(this);
+        this.deleteMember = this.deleteMember.bind(this);
         this.cancelButton = this.cancelButton.bind(this);
+        
     }
 
  
 
     componentDidMount() {
-        console.log(this.props.location.state.id);
-        console.log(this.context.members);
+        //console.log(this.props.location.state.id);
+        //console.log(this.context.members);
         let filteredList = this.context.members.filter(member => (member._id == this.props.location.state.id));
         filteredList.length > 0 && this.setState({
             name: filteredList[0].name, 
@@ -83,14 +88,42 @@ class EditMember extends React.Component {
         })
         //this is what we are getting from the url above
             .then(response => response.json())
-            .then(response => alert(JSON.stringify(response)));
+            .then(response => alert(JSON.stringify(response)))
+            .then(response => alert("Modified user: " + " Name: " + this.state.name + " Surname: " + this.state.surname ))
+            .then(this.props.history.push("/members"));
        
             
     }
+   
+    deleteMember(event) {
+        event.preventDefault();
+        fetch('http://127.0.0.1:3001/members/delete/' + this.props.location.state.id, {
+        method: 'DELETE'
+        
+    })
+   .then(response => alert("Deleted user: " + " Name: " + this.state.name + " Surname: " + this.state.surname ))
+   .then(this.props.history.push("/members"));
+    
+  }
+
+  /* esta es otra manera de hacer delete, en este caso pasariamos en el on click del boton que llama a la funcion onClick={this.deleteMember(this.props.location.state.id)}
+  
+  deleteMember(id) {
+    event.preventDefault();
+    fetch('http://127.0.0.1:3001/members/delete/' + id, {
+    method: 'DELETE'
+    
+})
+.then(response => alert("Deleted user: " + " Name: " + this.state.name + " Surname: " + this.state.surname ));
+
+}*/
 
     cancelButton() {
         this.props.history.push("/members");
     }
+
+    
+
     
 
     render() {
@@ -137,9 +170,34 @@ class EditMember extends React.Component {
                                             <input type="text" id="inputEmail" className="form-control" value={this.state.type} /*onChange={this.handleTypeChange}*/ required />
                                             
                                         </div>
-                                        <button type="button" class="btn btn-primary btn-lg" onClick={this.editMember} disabled={this.state.submitDisabled}>Edit member</button>
+                                        <br/>
+                                        <button type="button" className="btn btn-primary btn-lg" onClick={this.editMember} disabled={this.state.submitDisabled}>Edit member</button>
                                         <div className="float-right">
-                                            <button type="button" class="btn btn-secondary btn-lg btn-secondary" onClick={this.cancelButton}>Cancel</button>
+
+
+                                        <button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalDelete" /*onClick={this.deleteConfirmation}*/>Delete member</button>
+                                        <div className="modal fade" id="modalDelete" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                            <div className="modal-dialog" role="document">
+                                            <div className="modal-content">
+                                                <div className="modal-header">
+                                                <h5 className="modal-title" id="exampleModalLongTitle">Are you sure you want to delete this user?:</h5>
+                                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                </div>
+                                                <div className="modal-body">
+
+                                                <div>{" Name: " + this.state.name + " Surname: " + this.state.surname} </div>
+
+                                                </div>
+                                                <div className="modal-footer">
+                                                <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.cancelButton}>Cancel</button>
+                                                <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.deleteMember}>Confirm delete</button>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                            
                                         </div>
                                     </form>
                                 </div>
