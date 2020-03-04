@@ -5,7 +5,7 @@ import Navbar from "./navbar";
 
 
 
-class EditMember extends React.Component {
+class EditExcursion extends React.Component {
 
     static contextType = AppContext;
 
@@ -15,20 +15,18 @@ class EditMember extends React.Component {
         this.state = {
             id: "",
             name: "",
-            surname: "",
-            birthDate: "",
-            clubId: "",
-            licenseNumber: "",
-            type: ""
-
+            date: "",
+            users_id: []
 
         }
         
         this.handleNameChange = this.handleNameChange.bind(this);
-        this.handleSurnameChange = this.handleSurnameChange.bind(this);
-        this.editMember = this.editMember.bind(this);
-        this.deleteMember = this.deleteMember.bind(this);
+        this.handleDateChange = this.handleDateChange.bind(this);
+        this.handleIdsChange = this.handleDateChange.bind(this);
+        this.editExcursion = this.editExcursion.bind(this);
+        this.deleteExcursion = this.deleteExcursion.bind(this);
         this.cancelButton = this.cancelButton.bind(this);
+        
         
     }
 
@@ -37,15 +35,11 @@ class EditMember extends React.Component {
     componentDidMount() {
         //console.log(this.props.location.state.id);
         //console.log(this.context.members);
-        let filteredList = this.context.members.filter(member => (member._id == this.props.location.state.id));
+        let filteredList = this.context.excursions.filter(excursion => (excursion._id == this.props.location.state.id));
         filteredList.length > 0 && this.setState({
+            users_id: filteredList[0].users_id,
             name: filteredList[0].name, 
-            surname:filteredList[0].surname, 
-            birthDate: filteredList[0].birthDate, 
-            clubId: filteredList[0].clubId, 
-            licenseNumber: filteredList[0].licenseNumber, 
-            type: filteredList[0].type, 
-            responsibilityAgreementSigned: filteredList[0].responsibilityAgreementSigned,
+            date:filteredList[0].date, 
             id: filteredList[0]._id });
 
     }
@@ -54,32 +48,31 @@ class EditMember extends React.Component {
 
     }
 
-    handleSurnameChange(event) {
-        this.setState({ surname: event.target.value });
+    handleDateChange(event) {
+        this.setState({ date: event.target.value });
     }
 
     handleNameChange(event) {
         this.setState({ name: event.target.value });
     }
 
+    handleIdsChange(event) {
+        this.setState({ users_id: event.target.value });
+    }
+
    
 
-    editMember(event) {
-          //alert ("New user: " + " Username: " + this.state.userName + " Name: " + this.state.name + + " Email: " +this.state.email);
-
+    editExcursion(event) {
+          
           event.preventDefault();
         
-        fetch('http://127.0.0.1:3001/members/', {
+        fetch('http://127.0.0.1:3001/excursions/', {
             method: 'PUT',
             body: JSON.stringify({
                 _id: this.state.id,
                 name: this.state.name,
-                surname: this.state.surname,
-                birthDate: this.state.birthDate,
-                clubId: this.state.clubId,
-                licenseNumber: this.state.licenseNumber,
-                type: this.state.type,
-                responsibilityAgreementSigned: this.state.responsibilityAgreementSigned
+                date: this.state.date,
+                users_id: this.state.users_id
 
             }),
             headers: {
@@ -89,20 +82,20 @@ class EditMember extends React.Component {
         //this is what we are getting from the url above
             .then(response => response.json())
             .then(response => alert(JSON.stringify(response)))
-            .then(response => alert("Modified user: " + " Name: " + this.state.name + " Surname: " + this.state.surname ))
-            .then(this.props.history.push("/members"));
+            .then(response => alert("Modified excursion: " + " Name: " + this.state.name + " Date: " + this.state.date ))
+            .then(this.props.history.push("/excursions"));
        
             
     }
    
-    deleteMember(event) {
+    deleteExcursion(event) {
         event.preventDefault();
-        fetch('http://127.0.0.1:3001/members/delete/' + this.props.location.state.id, {
+        fetch('http://127.0.0.1:3001/excursions/delete/' + this.props.location.state.id, {
         method: 'DELETE'
         
     })
-   .then(response => alert("Deleted user: " + " Name: " + this.state.name + " Surname: " + this.state.surname ))
-   .then(this.props.history.push("/members"));
+   .then(response => alert("Deleted excursion: " + " Name: " + this.state.name + " Date: " + this.state.date ))
+   .then(this.props.history.push("/excursions"));
     
   }
 
@@ -134,7 +127,7 @@ class EditMember extends React.Component {
                                 <div className="card-img-left d-none d-md-flex">
                                 </div>
                                 <div className="card-body">
-                                    <h5 className="card-title text-center">Member details</h5>
+                                    <h5 className="card-title text-center">Excursion details</h5>
                                     <form className="form-signin">
                                         <div className="form-label-group">
                                             <label>Name</label>
@@ -143,41 +136,27 @@ class EditMember extends React.Component {
                                         </div>
     
                                         <div className="form-label-group">
-                                            <label>Surname</label>
-                                            <input type="text" id="inputName" className="form-control" value={this.state.surname} onChange={this.handleSurnameChange} required />
+                                            <label>Date</label>
+                                            <input type="text" id="inputName" className="form-control" value={this.state.date} onChange={this.handleDateChange} required />
                                             
                                         </div>
                                         <div className="form-label-group">
-                                            <label>Birth date</label>
-                                            <input type="text" id="inputEmail" className="form-control" value={this.state.birthDate} /*onChange={this.handleBirthChange} */required />
+                                            <label>Members Id</label>
+                                            <input type="text" id="inputName" className="form-control" value={this.state.users_id} onChange={this.handleIdsChange} required />
                                             
                                         </div>
-                                        <div className="form-label-group">
-                                            <label>Club Id</label>
-                                            <input type="text" id="inputEmail" className="form-control" value={this.state.clubId} /*onChange={this.handleClubChange}*/ required />
-                                            
-                                        </div>
-                                        <div className="form-label-group">
-                                            <label>License Number</label>
-                                            <input type="text" id="inputEmail" className="form-control" value={this.state.licenseNumber} /*onChange={this.handleLicenseChange} */required />
-                                            
-                                        </div>
-                                        <div className="form-label-group">
-                                            <label>Type</label>
-                                            <input type="text" id="inputEmail" className="form-control" value={this.state.type} /*onChange={this.handleTypeChange}*/ required />
-                                            
-                                        </div>
+                                        
                                         <br/>
-                                        <button type="button" className="btn btn-primary btn-lg" onClick={this.editMember} disabled={this.state.submitDisabled}>Edit member</button>
+                                        <button type="button" className="btn btn-primary btn-lg" onClick={this.editExcursion} disabled={this.state.submitDisabled}>Edit excursion</button>
                                         <div className="float-right">
 
 
-                                        <button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalDelete" /*onClick={this.deleteConfirmation}*/>Delete member</button>
-                                        <div className="modal fade" id="modalDelete" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                        <button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalDeleteExcursion" /*onClick={this.deleteConfirmation}*/>Delete excursion</button>
+                                        <div className="modal fade" id="modalDeleteExcursion" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
                                             <div className="modal-dialog" role="document">
                                             <div className="modal-content">
                                                 <div className="modal-header">
-                                                <h5 className="modal-title" id="exampleModalLongTitle">Are you sure you want to delete this user?:</h5>
+                                                <h5 className="modal-title" id="exampleModalLongTitle">Are you sure you want to delete this excursion?:</h5>
                                                 <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
@@ -189,7 +168,7 @@ class EditMember extends React.Component {
                                                 </div>
                                                 <div className="modal-footer">
                                                 <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.cancelButton}>Cancel</button>
-                                                <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.deleteMember}>Confirm delete</button>
+                                                <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.deleteExcursion}>Confirm delete</button>
                                                 </div>
                                             </div>
                                             </div>
@@ -207,4 +186,4 @@ class EditMember extends React.Component {
         }
     }
 
-export default EditMember;
+export default EditExcursion;

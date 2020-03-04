@@ -11,7 +11,10 @@ import {
 import Members from './components/members.js';
 import Excursions from './components/excursions.js';
 import EditMember from './components/editMember';
+import EditExcursion from './components/editExcursion';
 import {ContextProvider} from './context/ContextProvider.js';
+import CreateMember from './components/createMember.js';
+import CreateExcursion from './components/createExcursion';
 
 
 
@@ -35,6 +38,9 @@ constructor(props) {
               <Route path="/members" exact component = {Members}/>
               <Route path="/excursions" exact component = {Excursions}/>
               <Route path= "/editmember" component={EditMember} />
+              <Route path= "/editexcursion" component={EditExcursion} />
+             <Route path= "/createmember" component={CreateMember}/>
+             <Route path= "/createexcursion" component={CreateExcursion}/>
             </Switch>
           </Router>
           </ContextProvider>
