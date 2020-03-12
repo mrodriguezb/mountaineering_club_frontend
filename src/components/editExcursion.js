@@ -1,6 +1,7 @@
 import React from "react";
 import { AppContext } from "./../context/ContextProvider";
 import Navbar from "./navbar";
+import { Multiselect } from "multiselect-react-dropdown";
 
 
 
@@ -11,14 +12,8 @@ class EditExcursion extends React.Component {
 
     constructor(props) {
         super(props);
-        //const memberId = props.location.state.id;
-        this.state = {
-            id: "",
-            name: "",
-            date: "",
-            users_id: []
-
-        }
+        
+       
         
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
@@ -26,7 +21,12 @@ class EditExcursion extends React.Component {
         this.editExcursion = this.editExcursion.bind(this);
         this.deleteExcursion = this.deleteExcursion.bind(this);
         this.cancelButton = this.cancelButton.bind(this);
+        this.handleIdChange = this.handleIdChange.bind(this);
+        this.addMemberToExcursion = this.addMemberToExcursion.bind(this);
         
+        this.state = {
+            
+        }
         
     }
 
@@ -35,13 +35,11 @@ class EditExcursion extends React.Component {
     componentDidMount() {
         //console.log(this.props.location.state.id);
         //console.log(this.context.members);
-        let filteredList = this.context.excursions.filter(excursion => (excursion._id == this.props.location.state.id));
-        filteredList.length > 0 && this.setState({
-            users_id: filteredList[0].users_id,
-            name: filteredList[0].name, 
-            date:filteredList[0].date, 
-            id: filteredList[0]._id });
+        this.context.retrieveMembers();
+        let currentExcursion = this.context.excursions.find(excursion => (excursion._id == this.props.location.state.id));
+        this.setState({currentExcursion})
 
+       
     }
 
     componentDidUpdate() {
@@ -49,18 +47,43 @@ class EditExcursion extends React.Component {
     }
 
     handleDateChange(event) {
-        this.setState({ date: event.target.value });
+        this.setState({ currentExcursion: {...this.state.currentExcursion, date: event.target.value}});
     }
 
     handleNameChange(event) {
-        this.setState({ name: event.target.value });
+        this.setState({ currentExcursion: {...this.state.currentExcursion, name: event.target.value}});
     }
 
     handleIdsChange(event) {
         this.setState({ users_id: event.target.value });
     }
 
-   
+    handleIdChange (e, index) {
+        this.state.users_id[index] = e.target.value;
+
+        //set the change state
+        this.setState({users_id: this.state.users_id})
+
+
+    }
+
+    addMemberToExcursion(event) {
+        
+        event.preventDefault();
+        let select = document.getElementById("availableUsers");
+        let options = select.options;
+        options = Array.from(options);
+        
+        let membersId = options.filter( opt => opt.selected ).map( opt => opt.value );
+        console.log(membersId);
+        let members = membersId && this.context.members.filter(element => membersId.includes(element._id));
+
+       
+        this.setState({ currentExcursion: {...this.state.currentExcursion, members_info: [...this.state.currentExcursion.members_info, ...members]}});
+
+
+    }
+
 
     editExcursion(event) {
           
@@ -69,10 +92,10 @@ class EditExcursion extends React.Component {
         fetch('http://127.0.0.1:3001/excursions/', {
             method: 'PUT',
             body: JSON.stringify({
-                _id: this.state.id,
-                name: this.state.name,
-                date: this.state.date,
-                users_id: this.state.users_id
+                _id: this.state.currentExcursion._id,
+                name: this.state.currentExcursion.name,
+                date: this.state.currentExcursion.date,
+                users_id: this.state.currentExcursion.users_id
 
             }),
             headers: {
@@ -82,11 +105,13 @@ class EditExcursion extends React.Component {
         //this is what we are getting from the url above
             .then(response => response.json())
             .then(response => alert(JSON.stringify(response)))
-            .then(response => alert("Modified excursion: " + " Name: " + this.state.name + " Date: " + this.state.date ))
+            .then(response => alert("Modified excursion: " + " Name: " + this.state.currentExcursion.name + " Date: " + this.state.currentExcursion.date ))
             .then(this.props.history.push("/excursions"));
        
             
     }
+
+
    
     deleteExcursion(event) {
         event.preventDefault();
@@ -94,7 +119,7 @@ class EditExcursion extends React.Component {
         method: 'DELETE'
         
     })
-   .then(response => alert("Deleted excursion: " + " Name: " + this.state.name + " Date: " + this.state.date ))
+   .then(response => alert("Deleted excursion: " + " Name: " + this.state.currentExcursion.name + " Date: " + this.state.currentExcursion.date ))
    .then(this.props.history.push("/excursions"));
     
   }
@@ -115,6 +140,7 @@ class EditExcursion extends React.Component {
         this.props.history.push("/members");
     }
 
+    
 
     render() {
         return (
@@ -131,27 +157,56 @@ class EditExcursion extends React.Component {
                                     <form className="form-signin">
                                         <div className="form-label-group">
                                             <label>Name</label>
-                                            <input type="text" id="inputUserName" className="form-control" value={this.state.name} onChange={this.handleNameChange} required autofocus />
+                                            <input type="text" id="inputUserName" className="form-control" value={this.state.currentExcursion?.name} onChange={this.handleNameChange} required autofocus />
                                             
                                         </div>
     
                                         <div className="form-label-group">
                                             <label>Date</label>
-                                            <input type="text" id="inputName" className="form-control" value={this.state.date} onChange={this.handleDateChange} required />
+                                            <input type="text" id="inputName" className="form-control" value={this.state.currentExcursion?.date} onChange={this.handleDateChange} required />
                                             
                                         </div>
                                         <div className="form-label-group">
-                                            <label>Members Id</label>
-                                            <input type="text" id="inputName" className="form-control" value={this.state.users_id} onChange={this.handleIdsChange} required />
-                                            
-                                        </div>
+                                            <label>Members Joined to Excursion</label>
+                                            <select multiple id="joinedUsers" className="form-control" /*onChange={this.handleIdsChange}*/  >
+                                            {
+                                                this.state.currentExcursion?.members_info.map(user => {
+                                                    return (
+                                                    <option value={user._id}>{user.name}</option>
+                                              
+                                                    )
+                                                })
+                                            }
+                                            </select>
+                                            </div>
                                         
+                                            <div className="form-label-group">
+
+                                            <label>List of members</label>
+                                            <select multiple id="availableUsers" className="form-control" /*onChange={this.handleIdsChange}*/  >
+                                            {
+                                                this.context.members.map(user => {
+                                                    return (
+                                                    <option value={user._id}>{user.name}</option>
+                                              
+                                                    )
+                                                })
+                                            }
+                                            </select>
+                                            <button onClick={(e) => this.addMemberToExcursion(e)}>Add members to excursion</button>
+                                        </div>
+                                                                                                              
+    
                                         <br/>
+                                        <div className="form-label-group">
                                         <button type="button" className="btn btn-primary btn-lg" onClick={this.editExcursion} disabled={this.state.submitDisabled}>Edit excursion</button>
                                         <div className="float-right">
 
 
                                         <button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalDeleteExcursion" /*onClick={this.deleteConfirmation}*/>Delete excursion</button>
+
+                                        </div>
+                                        
                                         <div className="modal fade" id="modalDeleteExcursion" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
                                             <div className="modal-dialog" role="document">
                                             <div className="modal-content">
@@ -163,10 +218,12 @@ class EditExcursion extends React.Component {
                                                 </div>
                                                 <div className="modal-body">
 
-                                                <div>{" Name: " + this.state.name + " Surname: " + this.state.surname} </div>
+                                                <div>{" Name: " + this.state.currentExcursion?.name + " Date: " + this.state.currentExcursion?.date} </div>
 
                                                 </div>
                                                 <div className="modal-footer">
+                                                
+                                                
                                                 <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.cancelButton}>Cancel</button>
                                                 <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.deleteExcursion}>Confirm delete</button>
                                                 </div>
