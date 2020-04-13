@@ -15,6 +15,7 @@ class CreateMember extends React.Component {
         this.state = {
            
             name: "",
+            password: "",
             surname: "",
             birthDate: "",
             clubId: "",
@@ -27,6 +28,7 @@ class CreateMember extends React.Component {
         
         
         this.handleNameChange = this.handleNameChange.bind(this);
+        this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSurnameChange = this.handleSurnameChange.bind(this);
         this.handleBirthdateChange = this.handleBirthdateChange.bind(this);
         this.handleClubIdChange = this.handleClubIdChange.bind(this);
@@ -52,6 +54,10 @@ class CreateMember extends React.Component {
 
     handleNameChange(event) {
         this.setState({ name: event.target.value });
+    }
+
+    handlePasswordChange(event) {
+        this.setState({ password: event.target.value });
     }
 
     handleSurnameChange(event) {
@@ -90,6 +96,7 @@ class CreateMember extends React.Component {
             body: JSON.stringify({
                 
                 name: this.state.name,
+                password: this.state.password,
                 surname: this.state.surname,
                 birthDate: this.state.birthDate,
                 clubId: this.state.clubId,
@@ -133,6 +140,12 @@ class CreateMember extends React.Component {
                                         <div className="form-label-group">
                                             <label>Name</label>
                                             <input type="text" id="inputUserName" className="form-control"  onChange={this.handleNameChange} required autofocus />
+                                            
+                                        </div>
+
+                                        <div className="form-label-group">
+                                            <label>Password</label>
+                                            <input type="text" id="inputUserName" className="form-control"  onChange={this.handlePasswordChange} required autofocus />
                                             
                                         </div>
     

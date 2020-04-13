@@ -1,7 +1,7 @@
 import React from "react";
 import { AppContext } from "./../context/ContextProvider";
 import Navbar from "./navbar";
-import { Multiselect } from "multiselect-react-dropdown";
+
 
 
 
@@ -25,7 +25,7 @@ class EditExcursion extends React.Component {
         this.addMemberToExcursion = this.addMemberToExcursion.bind(this);
         
         this.state = {
-            
+          listOfMembers : []
         }
         
     }
@@ -36,10 +36,14 @@ class EditExcursion extends React.Component {
         //console.log(this.props.location.state.id);
         //console.log(this.context.members);
         this.context.retrieveMembers();
+
         let currentExcursion = this.context.excursions.find(excursion => (excursion._id == this.props.location.state.id));
         this.setState({currentExcursion})
 
-       
+       let copyOfMembers = this.context.members.filter(member => member._id);
+       this.setState({
+           listOfMembers: copyOfMembers
+       })
     }
 
     componentDidUpdate() {
@@ -74,12 +78,25 @@ class EditExcursion extends React.Component {
         let options = select.options;
         options = Array.from(options);
         
+        
+        let mermbersList = this.context.members
         let membersId = options.filter( opt => opt.selected ).map( opt => opt.value );
-        console.log(membersId);
-        let members = membersId && this.context.members.filter(element => membersId.includes(element._id));
 
-       
+        //que te filtre y te devuelva el elemento del array con los elementos que no has seleccionado
+
+        let otherMembers = this.state.listOfMembers.filter(member => !membersId.includes(member._id));
+        console.log("almacenado en otherMembers");
+        console.log(otherMembers);
+
+
+        let members = membersId && this.context.members.filter(element => membersId.includes(element._id));
+        
+
+        
         this.setState({ currentExcursion: {...this.state.currentExcursion, members_info: [...this.state.currentExcursion.members_info, ...members]}});
+        this.setState({listOfMembers: otherMembers});
+
+        
 
 
     }
@@ -185,7 +202,7 @@ class EditExcursion extends React.Component {
                                             <label>List of members</label>
                                             <select multiple id="availableUsers" className="form-control" /*onChange={this.handleIdsChange}*/  >
                                             {
-                                                this.context.members.map(user => {
+                                                this.state.listOfMembers.map(user => {
                                                     return (
                                                     <option value={user._id}>{user.name}</option>
                                               

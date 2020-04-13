@@ -18,12 +18,17 @@ export class ContextProvider extends React.Component {
     }
 
     retrieveMembers() {
-        
-        fetch("http://127.0.0.1:3001/members/list")
+        return new Promise ((resolve, reject) => {
+
+            fetch("http://127.0.0.1:3001/members/list")
           .then(res => res.json())
           .then((json) => {
-              this.setState({members: json});      
-        })
+            this.setState({members: json});
+            resolve(json);
+                 
+            })
+        }    
+        )        
     }
 
     retrieveExcursions() {
